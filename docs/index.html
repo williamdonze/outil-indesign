@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Textes InDesign</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+      <span>Textes InDesign</span>
+    </div>
+    <div id="doc-info" class="doc-info" hidden></div>
+    <nav id="actions" class="actions" hidden>
+      <span id="save-status" class="save-status" aria-live="polite"></span>
+      <button id="btn-export" class="primary" type="button">Télécharger l’IDML modifié</button>
+      <div class="menu">
+        <button id="btn-menu" type="button" aria-haspopup="true" aria-expanded="false">Plus ▾</button>
+        <div id="menu" class="menu-list" role="menu" hidden>
+          <button type="button" role="menuitem" data-action="report-html">Récapitulatif pour le graphiste (.html)</button>
+          <button type="button" role="menuitem" data-action="report-txt">Récapitulatif pour le graphiste (.txt)</button>
+          <hr>
+          <button type="button" role="menuitem" data-action="json-export">Exporter mes modifications (.json)</button>
+          <button type="button" role="menuitem" data-action="json-import">Importer des modifications (.json)…</button>
+          <hr>
+          <button type="button" role="menuitem" data-action="advanced">Panneau avancé…</button>
+          <button type="button" role="menuitem" data-action="close">Fermer le fichier</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Écran d'accueil -->
+    <section id="home" class="home">
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-describedby="drop-help">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 32V10m0 0-8 8m8-8 8 8"/><path d="M8 30v8h32v-8"/></svg>
+        <p class="drop-title">Déposez ici le fichier <strong>.idml</strong> envoyé par le graphiste</p>
+        <p id="drop-help" class="drop-help">ou cliquez pour le choisir</p>
+        <input id="file-input" type="file" accept=".idml" hidden>
+      </div>
+      <div id="error" class="error" role="alert" hidden></div>
+      <p class="privacy">🔒 Tout se passe dans votre navigateur : le fichier et vos textes ne sont jamais envoyés sur Internet. Vos modifications sont enregistrées automatiquement sur cet ordinateur.</p>
+
+      <div id="projects" class="projects" hidden>
+        <h2>Reprendre un travail en cours</h2>
+        <ul id="project-list"></ul>
+      </div>
+
+      <details class="help">
+        <summary>Comment ça marche ?</summary>
+        <ol>
+          <li>Le graphiste enregistre son document InDesign au format <strong>IDML</strong> (Fichier &gt; Enregistrer sous… &gt; InDesign Markup (IDML)) et vous l’envoie.</li>
+          <li>Déposez le fichier ici, puis modifiez les textes. À gauche, le plan des pages ; à droite, les textes.</li>
+          <li>Cliquez sur « Télécharger l’IDML modifié » et envoyez le fichier au graphiste, avec le récapitulatif (menu « Plus »).</li>
+        </ol>
+        <p>Seul le contenu des textes change : styles, blocs, positions et images restent intacts.</p>
+      </details>
+    </section>
+
+    <!-- Éditeur -->
+    <section id="editor" class="editor" hidden>
+      <div class="toolbar">
+        <div class="search">
+          <input id="search" type="search" placeholder="Rechercher dans les textes…" aria-label="Rechercher dans les textes">
+          <span id="search-count" class="search-count" aria-live="polite"></span>
+        </div>
+        <label class="check"><input id="only-modified" type="checkbox"> Seulement les textes modifiés</label>
+        <div class="chars" role="group" aria-label="Insérer un caractère spécial">
+          <span class="chars-label">Insérer :</span>
+          <button type="button" data-insert="&#x00A0;" title="Espace insécable">esp. insécable</button>
+          <button type="button" data-insert="&#x202F;" title="Espace fine insécable (avant ; : ! ?)">esp. fine</button>
+          <button type="button" data-insert="’" title="Apostrophe typographique">’</button>
+          <button type="button" data-insert="«&#x00A0;" data-insert-after="&#x00A0;»" title="Guillemets français">« »</button>
+          <button type="button" data-insert="–" title="Tiret demi-cadratin">–</button>
+          <button type="button" data-insert="—" title="Tiret cadratin">—</button>
+          <button type="button" data-insert="…" title="Points de suspension">…</button>
+          <button type="button" data-insert="↲" title="Saut de ligne forcé (Maj+Entrée)">↲ saut de ligne</button>
+        </div>
+      </div>
+      <p class="legend">
+        <kbd>Entrée</kbd> = nouveau paragraphe (même style) · <kbd>Maj</kbd>+<kbd>Entrée</kbd> = saut de ligne forcé <span class="lb">↲</span> ·
+        <span class="legend-mod">surligné</span> = modifié · <span class="legend-alert">rouge</span> = plus de +10 % de caractères (risque de débordement)
+      </p>
+      <div class="columns">
+        <aside id="plan" class="plan" aria-label="Plan des pages"></aside>
+        <div id="texts" class="texts" aria-label="Textes"></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="advanced" class="dialog">
+    <form method="dialog" class="dialog-close"><button aria-label="Fermer">✕</button></form>
+    <h2>Panneau avancé</h2>
+    <div id="advanced-body"></div>
+  </dialog>
+
+  <input id="json-input" type="file" accept=".json,application/json" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="error">Cet outil nécessite JavaScript.</p></noscript>
+</body>
+</html>

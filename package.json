@@ -1,0 +1,12 @@
+{
+  "name": "outil-indesign",
+  "private": true,
+  "type": "module",
+  "description": "Éditeur de textes pour fichiers InDesign IDML, 100 % dans le navigateur",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "fixture": "node tests/fixtures/build-fixture.mjs",
+    "serve": "python3 -m http.server 8000 --directory docs"
+  },
+  "engines": { "node": ">=20" }
+}
