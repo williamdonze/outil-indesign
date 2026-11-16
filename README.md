@@ -1,4 +1,62 @@
-# Textes InDesign — modifier les textes d’un fichier IDML sans toucher à la mise en page
+# Outils InDesign — GitHub Pages
+
+Ce dépôt publie deux outils 100 % dans le navigateur (dossier `docs/`) :
+
+| Outil | Adresse (une fois publié) | Rôle |
+|---|---|---|
+| **Générateur de fiches PDF** | `https://<compte>.github.io/outil-indesign/fiches/` | Remplir des champs → PDF A4 identique à la maquette InDesign « Cartographie de l’équipe » |
+| Textes InDesign | `https://<compte>.github.io/outil-indesign/` | Modifier les textes d’un fichier `.idml` |
+
+---
+
+## Générateur de fiches PDF (`docs/fiches/`)
+
+### Utilisation
+
+1. **Une ligne par fiche** dans la colonne de gauche. « + Nouvelle fiche » en ajoute une ; ⧉ duplique, ↑ ↓ réordonnent, ✕ supprime.
+2. Cliquez sur une fiche pour remplir ses champs (colonne du milieu). L’**aperçu** (à droite) se met à jour en direct.
+   - **Titre** : chaque retour à la ligne est conservé.
+   - **Rubriques à puces** (A utiliser quand…, pour…, Matériel, Temps, Points d’attention) : **une ligne = une puce**.
+   - **Etapes-clé** : une ligne = une étape, numérotée automatiquement.
+   - **Temps** : les chiffres en début de ligne (« 45-90 ») sont mis en gras.
+   - Les intertitres (But, A utiliser quand…, Implication, Matériel, Temps, Etapes-clé, Points d’attention) et les 3 pictogrammes sont fixes.
+   - Si un texte est trop long pour son emplacement, un ⚠ s’affiche (dans la liste et sous l’aperçu).
+3. **Image en haut à droite** : glissez une image depuis le Finder (ou cliquez). Elle est recadrée pour remplir le carré. Sans image, le carré gris reste.
+4. **Logo** du cercle rouge : choix « Logo 1 » / « Logo 2 ». Les deux images se déposent dans **`docs/fiches/logos/`** sous les noms `logo-1.png|jpg` et `logo-2.png|jpg` (voir `logos/LISEZMOI.md`).
+5. **PDF à ajouter** (en bas du formulaire) : ses pages sont greffées après la page de titre générée.
+6. **Générer** : cochez des fiches → « Générer les fiches cochées », ou « Générer toutes les fiches », ou le bouton **PDF** d’une ligne. Une fiche = un PDF ; plusieurs = un `.zip` (un PDF par fiche, nommé d’après le titre ou le champ « Nom du fichier »).
+
+### Enregistrement et sauvegarde
+
+- Tout est enregistré **automatiquement dans le navigateur** : la base des fiches dans le `localStorage` ; les images et PDF annexes dans IndexedDB (le `localStorage` est limité à ~5 Mo, trop peu pour des PDF). Rien n’est envoyé sur Internet.
+- **Sauvegarder dans un fichier** : télécharge un `.json` contenant toutes les fiches **avec** leurs images et PDF annexes.
+- **Restaurer une sauvegarde…** : recharge ce fichier (remplace les fiches actuelles, après confirmation). Sert aussi à passer sur un autre ordinateur ou navigateur.
+
+### Polices
+
+La maquette utilise **Zeitung Pro** (Regular, Semibold, Bold). Ces polices n’étaient pas dans le dossier InDesign et ne sont pas libres : tant qu’elles ne sont pas ajoutées, l’outil utilise **Mulish** (libre, largeur proche). Pour les ajouter : bouton **Polices** (stockées dans le navigateur, non publiées) ou dossier `docs/fiches/fonts/` (voir `fonts/LISEZMOI.md`).
+
+### Fichiers
+
+```
+docs/fiches/
+  index.html, css/fiches.css
+  js/layout.js   ← mise en page (positions, corps, interlignages repris de l'IDML)
+  js/render.js   ← dessin : PDF (pdf-lib) et aperçu (canvas)
+  js/db.js       ← localStorage, IndexedDB, sauvegarde .json
+  js/assets.js   ← polices, logos, pictogrammes
+  js/app.js      ← interface
+  logos/         ← logo-1 / logo-2 (à remplacer / compléter)
+  pictos/        ← pictogrammes Implication, Matériel, Temps (fixes)
+  fonts/         ← Zeitung Pro (facultatif) + secours/ (Mulish)
+  vendor/        ← pdf-lib et fontkit (copiés localement, aucun CDN)
+```
+
+Tests : `npm test` (fichier `tests/fiches.test.mjs`, vérifie notamment les lignes de base par rapport au PDF d’origine).
+
+---
+
+## Textes InDesign — modifier les textes d’un fichier IDML sans toucher à la mise en page
 
 Petit site statique qui permet de **modifier uniquement les textes** d’un document InDesign exporté au format **IDML**, puis de télécharger un `.idml` modifié que le graphiste rouvre dans InDesign pour produire le PDF final.
 

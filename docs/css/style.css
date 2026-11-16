@@ -231,3 +231,6 @@ textarea.piece.modified { background: var(--mod); border-color: var(--mod-line);
   .seg { grid-template-columns: 1fr; }
   .search input { width: 12rem; }
 }
+
+.tool-link { font-size: 13px; color: inherit; opacity: .75; margin-left: 12px; }
+.tool-link:hover { opacity: 1; }
